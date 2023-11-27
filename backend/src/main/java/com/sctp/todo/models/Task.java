@@ -4,6 +4,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 // Define a class called Task as an entity for database persistence.
 @Entity
@@ -14,6 +16,8 @@ public class Task {
     private Long id;
 
     // Define a field to store the task description.
+    @NotBlank(message = "Task description must not be blank.")
+    @Size(max = 255, message = "Task description must not be more than 255 characters.")
     private String task;
 
     // Define a field to represent whether the task is completed or not.

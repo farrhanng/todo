@@ -1,5 +1,6 @@
 package com.sctp.todo.services;
 
+import com.sctp.todo.exceptions.TaskNotFoundException;
 import com.sctp.todo.models.Task;
 import com.sctp.todo.repositories.TaskRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,38 +15,44 @@ public class TaskService {
     @Autowired
     private TaskRepository taskRepository;
 
-    // Method to create and save a new task.
+    // C: Method to create and save a new task.
     public Task createNewTask(Task task) {
         return taskRepository.save(task);
     }
 
-    // Method to retrieve a list of all tasks.
+    // R: Method to find a task by its id.
+    public Task findTaskById(Long id) {
+        return taskRepository.findById(id).orElseThrow(() -> new TaskNotFoundException("Task with id " + id + " not found"));
+    }
+
+    // R: Method to retrieve a list of all tasks.
     public List<Task> getAllTask() {
         return taskRepository.findAll();
     }
 
-    // Method to find a task by its id.
-    public Task findTaskById(Long id) {
-        return taskRepository.getById(id);
-    }
-
-    // Method to retrieve a list of all completed tasks.
+    // R: Method to retrieve a list of all completed tasks.
     public List<Task> findAllCompletedTask() {
         return taskRepository.findByCompletedTrue();
     }
 
-    // Method to retrieve a list of all incomplete tasks.
+    // R: Method to retrieve a list of all incomplete tasks.
     public List<Task> findAllInCompleteTask() {
         return taskRepository.findByCompletedFalse();
     }
 
-    // Method to delete a task.
-    public void deleteTask(Long id) {
-        taskRepository.deleteById(id);
+    // U: Method to update an existing task.
+    public Task updateTask(Task task) {
+        return taskRepository.findById(task.getId()).map(existingTask -> {
+            existingTask.setTask(task.getTask());
+            existingTask.setCompleted(task.isCompleted());
+            return taskRepository.save(existingTask);
+        }).orElseThrow(() -> new TaskNotFoundException("Task with id " + task.getId() + " not found"));
     }
 
-    // Method to update an existing task.
-    public Task updateTask(Task task) {
-        return taskRepository.save(task);
+    // D: Method to delete a task.
+    public void deleteTask(Long id) {
+        Task task = taskRepository.findById(id)
+                .orElseThrow(() -> new TaskNotFoundException("Task with id " + id + " not found"));
+        taskRepository.delete(task);
     }
 }
