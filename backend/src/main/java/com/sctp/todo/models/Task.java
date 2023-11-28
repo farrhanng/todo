@@ -1,24 +1,20 @@
 package com.sctp.todo.models;
 
 import jakarta.persistence.*;
-
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.NotBlank;
 
 // Define a class called Task as an entity for database persistence.
 @Entity
 public class Task {
     // Define id as the primary key, which will be auto-generated.
     @Id
+    @Column(name="id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     // Define a field to store the task description.
-    @NotBlank(message = "Task description must not be blank.")
-    @NotEmpty
-    @Size(max = 255, message = "Task description must not be more than 255 characters.")
-    @Column(nullable = false)
+    @Column(name="task")
+    @NotBlank(message = "Task cannot be blank.")
     private String task;
 
     // Define a field to represent whether the task is completed or not.

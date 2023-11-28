@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 // Define this class as a service for managing Task-related operations.
 @Service
@@ -21,8 +22,8 @@ public class TaskService {
     }
 
     // R: Method to find a task by its id.
-    public Task findTaskById(Long id) {
-        return taskRepository.findById(id).orElseThrow(() -> new TaskNotFoundException("Task with id " + id + " not found"));
+    public Optional<Task> findTaskById(Long id) {
+        return taskRepository.findById(id);
     }
 
     // R: Method to retrieve a list of all tasks.

@@ -2,32 +2,43 @@ package com.sctp.todo.controllers;
 
 import com.sctp.todo.models.Task;
 import com.sctp.todo.services.TaskService;
-import javax.validation.Valid;
+import com.sctp.todo.exceptions.TaskNotFoundException;
+
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
-// Define this class as a controller for handling Task-related API requests.
 @RestController
 @RequestMapping("/api/v1/tasks")
 public class TaskController {
 
-    // Autowire the TaskService to interact with task-related operations.
+    private final TaskService taskService;
+
     @Autowired
-    private TaskService taskService;
+    public TaskController(TaskService taskService) {
+        this.taskService = taskService;
+    }
 
     // C: Endpoint to create a new task.
     @PostMapping("/")
-    public ResponseEntity<Task> createTask(@Valid @RequestBody Task task) {
-        return ResponseEntity.ok(taskService.createNewTask(task));
+    public ResponseEntity<Object> createTask(@Valid @RequestBody Task task) {
+        return new ResponseEntity<>(taskService.createNewTask(task), HttpStatus.BAD_REQUEST);
     }
 
     // R: Endpoint to find a task.
     @GetMapping("/{id}")
-    public ResponseEntity<Task> findTaskById(@PathVariable Long id) {
-        Task task = taskService.findTaskById(id);
+    public ResponseEntity<Object> findTaskById(@PathVariable("id") Long id) {
+        Task task = taskService.findTaskById(id).orElseThrow(() -> new TaskNotFoundException("Task with id " + id + " not found."));
+
         return ResponseEntity.ok(task);
     }
 
@@ -51,15 +62,22 @@ public class TaskController {
 
     // U: Endpoint to update an existing task by its id.
     @PutMapping("/{id}")
-    public ResponseEntity<Task> updateTask(@PathVariable Long id, @Valid @RequestBody Task task) {
+    public ResponseEntity<Object> updateTask(@PathVariable("id") Long id, @Valid @RequestBody Task task) {
         task.setId(id);
-        return ResponseEntity.ok(taskService.updateTask(task));
+
+        Task updatedTask = taskService.updateTask(task);
+
+        if (updatedTask != null) {
+            return ResponseEntity.ok(updatedTask);
+        } else {
+            throw new TaskNotFoundException("Task with id " + id + " not found.");
+        }
     }
 
     // D: Endpoint to delete a task by its id.
     @DeleteMapping("/{id}")
-    public ResponseEntity<Boolean> deleteTask(@PathVariable Long id) {
+    public ResponseEntity<Object> deleteTask(@PathVariable("id") Long id) {
         taskService.deleteTask(id);
-        return ResponseEntity.ok(true);
+        return new ResponseEntity<>("Task is deleted successfully.", HttpStatus.OK);
     }
 }
