@@ -12,9 +12,13 @@ import java.util.Optional;
 // Define this class as a service for managing Task-related operations.
 @Service
 public class TaskService {
-    // Autowire the TaskRepository to interact with the database.
+
+    private final TaskRepository taskRepository;
+
     @Autowired
-    private TaskRepository taskRepository;
+    public TaskService(TaskRepository taskRepository) {
+        this.taskRepository = taskRepository;
+    }
 
     // C: Method to create and save a new task.
     public Task createNewTask(Task task) {
