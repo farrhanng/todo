@@ -2,7 +2,7 @@ package com.sctp.todo.controllers;
 
 import com.sctp.todo.models.Task;
 import com.sctp.todo.services.TaskService;
-import jakarta.validation.Valid;
+import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
